@@ -2,10 +2,9 @@
 #include <HTTPClient.h>
 #include "esp_wpa2.h" //wpa2 library for connections to Enterprise networks
 
-#define EAP_IDENTITY "esomethinsomething" //if connecting from another corporation, use identity@organisation.domain in Eduroam 
-#define EAP_USERNAME "esomethinsomething" //oftentimes just a repeat of the identity
-#define EAP_PASSWORD "didyoureallythinkthisismypassword" //your Eduroam password
-
+#define EAP_IDENTITY "" //if connecting from another corporation, use identity@organisation.domain in Eduroam 
+#define EAP_USERNAME "" //oftentimes just a repeat of the identity
+#define EAP_PASSWORD "" //your Eduroam password
 /*
   Analog input, analog output, serial output
 
@@ -39,6 +38,7 @@ int outputValue = 0;  // value output to the PWM (analog out)
 
 const char* ssid = "NUS_STU"; // Eduroam SSID
 const char* host = "www.google.com"; //external server domain for HTTP connection after authentification
+#define ENDPOINT "https://free-api-ryfe.onrender.com/seventeenWashers/update"
 int counter = 0;
 
 // NOTE: For some systems, various certification keys are required to connect to the wifi system.
@@ -108,20 +108,29 @@ void loop() {
   Serial.print("Connecting to website: ");
   Serial.println(host);
   WiFiClient client;
+  HTTPClient http;
+
   // syntax - client.connect(ip/URL, port)
   if (client.connect(host, 80)) {
+    Serial.println("Connected");
     // read the analog in value:
     sensorValue = analogRead(analogInPin);
     // map it to the range of the analog out:
     outputValue = map(sensorValue, 0, 1023, 0, 255);
     // change the analog out value:
     //analogWrite(analogOutPin, outputValue);
+    // print the results to the Serial Monitor:
+    Serial.print("sensor = ");
+    Serial.print(sensorValue);
+    Serial.print("\t output = ");
+    Serial.println(outputValue);
+
+    bool inUse = false;
 
     if (sensorValue > 3500) {
-      bool inUse = true;
       digitalWrite(2, 1);
     } else {
-      bool inUse = false;
+      inUse = true;
       digitalWrite(2, 0);
     }
 
@@ -129,27 +138,50 @@ void loop() {
     // converter to settle after the last reading:
     delay(2);
 
+    // Your Domain name with URL path or IP address with path
+    http.begin(ENDPOINT);
     http.addHeader("Content-Type", "application/json");
+    int httpResponseCode = -1000000;
     if (inUse) {
-      int httpResponseCode = http.POST("{\"api_key\":\".....", \"name\": \"Washer 5\", \"timeLeftUserInput\": 45}");
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer 5\", \"timeLeftUserInput\": 45}");
+
     } else {
-      int httpResponseCode = http.POST("{\"api_key\":\".....", \"name\": \"Washer 5\", \"timeLeftUserInput\": 0}");
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer 5\", \"timeLeftUserInput\": 0}");
     };
-    
-    // String url = "/rele/rele1.txt";
-    // client.print(String("POST ") + url + " HTTP/1.1\r\n" + "Host: " + host + "\r\n" + "User-Agent: ESP32\r\n" + "Connection: close\r\n\r\n");
-
-    while (client.connected()) {
-      String line = client.readStringUntil('\n');
-      if (line == "\r") {
-        break;
-      }
+    Serial.print("HTTP Response: ");
+    Serial.println(httpResponseCode);
+    if (httpResponseCode>0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String payload = http.getString();
+      Serial.println(payload);
     }
+    http.end();
 
-    String line = client.readStringUntil('\n');
-    Serial.println(line);
-
+    httpGET("https://free-api-ryfe.onrender.com/washers");
+    Serial.println();
   } else{
       Serial.println("Connection unsucessful");
   } 
+}
+
+void httpGET(char *endpoint){
+  HTTPClient http;
+  // Your Domain name with URL path or IP address with path
+  http.begin(endpoint);
+  // Send HTTP GET request
+  int httpResponseCode = http.GET();
+  
+  if (httpResponseCode>0) {
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+    String payload = http.getString();
+    Serial.println(payload);
+  }
+  else {
+    Serial.print("Error code: ");
+    Serial.println(httpResponseCode);
+  }
+  // Free resources
+  http.end();
 }

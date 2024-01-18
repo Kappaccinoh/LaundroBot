@@ -10,20 +10,14 @@ app.use(cors())
 
 app.use(express.json())
 
-mongoose.connect('REDACTED')
+mongoose.connect('')
 .then(() => {
     app.listen(3002, () => {
         console.log(`Node API app is running on port 3002`)
     })
     console.log('Connected to mongodb')
     
-}).catch(() => console.log('error'))
-
-
-
-
-
-
+}).catch((e) => console.log(e))
 
 //Routes
 
