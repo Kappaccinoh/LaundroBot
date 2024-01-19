@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import asyncio
 #api_url = 'REDACTED'
-api_url = 'http://localhost:3002'
-online_token = 'REDACTED'
+api_url = 'https://free-api-ryfe.onrender.com'
+online_token = '6251328058:AAGlKyxiO77DDQ93xvKh_11iWwF2pemsVnE'
 testing_token = ''
 
 
@@ -20,10 +20,10 @@ logging.basicConfig(
 
 def returnMinutesLeft(updatedAt, timeLeftUserInput):
     #below is the code to do the simple boolean on/off
-    if timeLeftUserInput == 45:
-        return f"  IN USE  "
-    else:
-        return "NOT IN USE"
+    # if timeLeftUserInput == 45:
+    #     return f"  IN USE  "
+    # else:
+    #     return "NOT IN USE"
 
     #above is the code to do the simple boolean on/off
     yymmdd = updatedAt[0:10]
@@ -452,7 +452,7 @@ async def update_status_message(context: ContextTypes.DEFAULT_TYPE) -> None:
     await context.bot.edit_message_text( final_str, chat_id='-1001932990612', message_id='14', parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
 
 if __name__ == '__main__':
-    application = ApplicationBuilder().token(testing_token).build()
+    application = ApplicationBuilder().token(online_token).build()
 
     
     start_handler = CommandHandler('start', start)
