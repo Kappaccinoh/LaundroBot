@@ -7,8 +7,8 @@ import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import asyncio
+
 #api_url = 'REDACTED'
-api_url = ''
 online_token = ''
 testing_token = ''
 
@@ -454,7 +454,6 @@ async def update_status_message(context: ContextTypes.DEFAULT_TYPE) -> None:
 if __name__ == '__main__':
     application = ApplicationBuilder().token(online_token).build()
 
-    
     start_handler = CommandHandler('start', start)
     start_update_loop_handler = CommandHandler('start_update_loop', start_update_loop)
     secretchannelmessage_handler = CommandHandler('secretchannelmessage', secretchannelmessage)
