@@ -8,8 +8,8 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import asyncio
 #api_url = 'REDACTED'
-api_url = 'https://free-api-ryfe.onrender.com'
-online_token = '6251328058:AAGlKyxiO77DDQ93xvKh_11iWwF2pemsVnE'
+api_url = ''
+online_token = ''
 testing_token = ''
 
 
