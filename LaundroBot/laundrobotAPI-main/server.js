@@ -10,7 +10,7 @@ app.use(cors())
 
 app.use(express.json())
 
-mongoose.connect('mongodb+srv://admin:admin@laundrobotapi.msler7u.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect("")
 .then(() => {
     app.listen(3002, () => {
         console.log(`Node API app is running on port 3002`)
