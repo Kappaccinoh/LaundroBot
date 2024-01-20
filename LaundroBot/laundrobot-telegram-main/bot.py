@@ -7,10 +7,12 @@ import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import asyncio
+
+
 api_url = 'https://free-api-ryfe.onrender.com/'
 #api_url = 'https://laundrobot-api.onrender.com/'
 online_token = '6251328058:AAGlKyxiO77DDQ93xvKh_11iWwF2pemsVnE'
-testing_token = ''
+
 
 
 logging.basicConfig(
