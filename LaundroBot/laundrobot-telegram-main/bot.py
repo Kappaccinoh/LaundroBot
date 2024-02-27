@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 import asyncio
 
 
-api_url = 'https://free-api-ryfe.onrender.com/'
+api_url = 'https://free-api-ryfe.onrender.com'
 #api_url = 'https://laundrobot-api.onrender.com/'
 #api_url = 'http://localhost:3002'
 online_token = '6251328058:AAGlKyxiO77DDQ93xvKh_11iWwF2pemsVnE'
@@ -83,6 +83,7 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == 'Status':
         washers_response_API = requests.get(f'{api_url}/washers')
         washers_data = washers_response_API.text
+        print(washers_data)
         washers_data_parsed = json.loads(washers_data)
         dryers_response_API = requests.get(f'{api_url}/dryers')
         dryers_data = dryers_response_API.text
@@ -242,6 +243,7 @@ async def update_status_message(context: ContextTypes.DEFAULT_TYPE) -> None:
 
     washers_response_API = requests.get(f'{api_url}/washers')
     washers_data = washers_response_API.text
+
     washers_data_parsed = json.loads(washers_data)
     dryers_response_API = requests.get(f'{api_url}/dryers')
     dryers_data = dryers_response_API.text
