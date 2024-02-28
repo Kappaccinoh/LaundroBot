@@ -28,13 +28,20 @@
 */
 
 // These constants won't change. They're used to give names to the pins used:
-const int analogInPin = 34;  // Analog input pin that the potentiometer is attached to
-const int fakeGND = 39;
+const int analogInPin0 = 36;  // Analog input pin that the potentiometer is attached to - Sensor 1
+const int analogInPin1 = 39; // Sensor 2
+const int analogInPin2 = 34; // Sensor 3
+const int analogInPin3 = 35; // Sensor 4
+const int analogInPin4 = 32; // Sensor 5
+
 
 //const int analogOutPin = 39;  // Analog output pin that the LED is attached to
 
-int sensorValue = 0;  // value read from the pot
-int outputValue = 0;  // value output to the PWM (analog out)
+int sensorValue0 = 0;  // value read from the pot
+int sensorValue1 = 0;  // value read from the pot
+int sensorValue2 = 0;  // value read from the pot
+int sensorValue3 = 0;  // value read from the pot
+int sensorValue4 = 0;  // value read from the pot
 
 const char* ssid = "NUS_STU"; // Eduroam SSID
 const char* host = "www.google.com"; //external server domain for HTTP connection after authentification
@@ -53,9 +60,6 @@ int counter = 0;
 
 void setup() {
   pinMode(2, OUTPUT);
-  
-  pinMode(fakeGND, OUTPUT);
-  digitalWrite(fakeGND, 0);
 
   Serial.begin(115200);
   delay(10);
@@ -113,25 +117,32 @@ void loop() {
   // syntax - client.connect(ip/URL, port)
   if (client.connect(host, 80)) {
     Serial.println("Connected");
+
     // read the analog in value:
-    sensorValue = analogRead(analogInPin);
-    // map it to the range of the analog out:
-    outputValue = map(sensorValue, 0, 1023, 0, 255);
-    // change the analog out value:
-    //analogWrite(analogOutPin, outputValue);
+    sensorValue0 = analogRead(analogInPin0);
+    sensorValue1 = analogRead(analogInPin1);
+    sensorValue2 = analogRead(analogInPin2);
+    sensorValue3 = analogRead(analogInPin3);
+    sensorValue4 = analogRead(analogInPin4);
+
+    int sensorValues[5] = {sensorValue0, sensorValue1, sensorValue2, sensorValue3, sensorValue4};
+    
     // print the results to the Serial Monitor:
-    Serial.print("sensor = ");
-    Serial.print(sensorValue);
-    Serial.print("\t output = ");
-    Serial.println(outputValue);
+    for (int i = 0; i < 5; i++) {
+      Serial.print("sensor" + String(i) + "output value: ");
+      Serial.print(sensorValues[i]);
+      Serial.print("\n");
+    }
 
-    bool inUse = false;
+    bool inUse[] = {false, false, false, false, false};
 
-    if (sensorValue > 3500) {
-      digitalWrite(2, 1);
-    } else {
-      inUse = true;
-      digitalWrite(2, 0);
+    for (int i = 0; i < 5; i++) {
+      if (sensorValues[i] > 3500) {
+        digitalWrite(2, 1);
+      } else {
+        inUse[i] = true;
+        digitalWrite(2, 0);
+      }
     }
 
     // wait 2 milliseconds before the next loop for the analog-to-digital
@@ -142,20 +153,23 @@ void loop() {
     http.begin(ENDPOINT);
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = -1000000;
-    if (inUse) {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer 5\", \"timeLeftUserInput\": 45}");
+    for (int i = 0; i < 5; i++) {
+      if (inUse[i]) {
+        httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(i) + "\", \"timeLeftUserInput\": 45}");
 
-    } else {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer 5\", \"timeLeftUserInput\": 0}");
-    };
-    Serial.print("HTTP Response: ");
-    Serial.println(httpResponseCode);
-    if (httpResponseCode>0) {
-      Serial.print("HTTP Response code: ");
+      } else {
+        httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(i) + "\", \"timeLeftUserInput\": 0}");
+      };
+      Serial.print("HTTP Response: ");
       Serial.println(httpResponseCode);
-      String payload = http.getString();
-      Serial.println(payload);
+      if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        String payload = http.getString();
+        Serial.println(payload);
+      }
     }
+    
     http.end();
 
     httpGET("https://free-api-ryfe.onrender.com/washers");
