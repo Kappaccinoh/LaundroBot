@@ -2,8 +2,8 @@
 #include <HTTPClient.h>
 #include "esp_wpa2.h" //wpa2 library for connections to Enterprise networks
 
-#define EAP_IDENTITY "" //if connecting from another corporation, use identity@organisation.domain in Eduroam 
-#define EAP_USERNAME "" //oftentimes just a repeat of the identity
+#define EAP_IDENTITY "e...." //if connecting from another corporation, use identity@organisation.domain in Eduroam 
+#define EAP_USERNAME "e...." //oftentimes just a repeat of the identity
 #define EAP_PASSWORD "" //your Eduroam password
 /*
   Analog input, analog output, serial output
@@ -27,6 +27,8 @@
   https://www.arduino.cc/en/Tutorial/BuiltInExamples/AnalogInOutSerial
 */
 
+// 10k ohm resistor for voltage divider
+
 // These constants won't change. They're used to give names to the pins used:
 const int analogInPin0 = 36;  // Analog input pin that the potentiometer is attached to - Sensor 1
 const int analogInPin1 = 39; // Sensor 2
@@ -37,11 +39,11 @@ const int analogInPin4 = 32; // Sensor 5
 
 //const int analogOutPin = 39;  // Analog output pin that the LED is attached to
 
-int sensorValue0 = 0;  // value read from the pot
-int sensorValue1 = 0;  // value read from the pot
-int sensorValue2 = 0;  // value read from the pot
-int sensorValue3 = 0;  // value read from the pot
-int sensorValue4 = 0;  // value read from the pot
+int sensorValue0 = 0;  // Washer 1 3.4k - 4k
+int sensorValue1 = 0;  // Washer 2 2.1k - 3k
+int sensorValue2 = 0;  // Washer 3 1.8k - 4k
+int sensorValue3 = 0;  // Washer 4 3.2k - 4k 
+int sensorValue4 = 0;  // Washer 5 1.7k - 4k
 
 const char* ssid = "NUS_STU"; // Eduroam SSID
 const char* host = "www.google.com"; //external server domain for HTTP connection after authentification
@@ -126,23 +128,25 @@ void loop() {
     sensorValue4 = analogRead(analogInPin4);
 
     int sensorValues[5] = {sensorValue0, sensorValue1, sensorValue2, sensorValue3, sensorValue4};
-    
+    int sensorThresholds[5] = {3800, 3000, 3000, 3000, 3000};
     // print the results to the Serial Monitor:
-    for (int i = 0; i < 5; i++) {
-      Serial.print("sensor" + String(i) + "output value: ");
-      Serial.print(sensorValues[i]);
-      Serial.print("\n");
-    }
-
+    
     bool inUse[] = {false, false, false, false, false};
 
     for (int i = 0; i < 5; i++) {
-      if (sensorValues[i] > 3500) {
+      if (sensorValues[i] > sensorThresholds[i]) {
         digitalWrite(2, 1);
       } else {
         inUse[i] = true;
         digitalWrite(2, 0);
       }
+    }
+
+    for (int i = 0; i < 5; i++) {
+      Serial.print("sensor" + String(i) + "output value: ");
+      Serial.print(sensorValues[i]);
+      Serial.print(" inUse="+String(inUse[i]));
+      Serial.print("\n");
     }
 
     // wait 2 milliseconds before the next loop for the analog-to-digital
@@ -153,13 +157,17 @@ void loop() {
     http.begin(ENDPOINT);
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = -1000000;
+
     for (int i = 0; i < 5; i++) {
+
+
       if (inUse[i]) {
-        httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(i) + "\", \"timeLeftUserInput\": 45}");
+        httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(i + 1) + "\", \"timeLeftUserInput\": 45}");
 
       } else {
-        httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(i) + "\", \"timeLeftUserInput\": 0}");
+        httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(i + 1) + "\", \"timeLeftUserInput\": 0}");
       };
+
       Serial.print("HTTP Response: ");
       Serial.println(httpResponseCode);
       if (httpResponseCode > 0) {
