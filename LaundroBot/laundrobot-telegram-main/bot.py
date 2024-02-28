@@ -62,8 +62,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Start the bot with /start
     buttons = [
         [KeyboardButton("Status")],
-        [KeyboardButton("Update a machine")],
-        [KeyboardButton("Main Menu")]
+        # [KeyboardButton("Update a machine")],
+        # [KeyboardButton("Main Menu")]
     ]
     text = 'Hello! I am Laundrobot!\n' \
         'I am here to assist with all laundry related matters. Here are ' \
@@ -81,33 +81,33 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = message.text
 
     if text == 'Status':
-        washers_response_API = requests.get(f'{api_url}/washers')
-        washers_data = washers_response_API.text
-        print(washers_data)
-        washers_data_parsed = json.loads(washers_data)
-        dryers_response_API = requests.get(f'{api_url}/dryers')
-        dryers_data = dryers_response_API.text
-        dryers_data_parsed = json.loads(dryers_data)
+        # washers_response_API = requests.get(f'{api_url}/washers')
+        # washers_data = washers_response_API.text
+        # print(washers_data)
+        # washers_data_parsed = json.loads(washers_data)
+        # dryers_response_API = requests.get(f'{api_url}/dryers')
+        # dryers_data = dryers_response_API.text
+        # dryers_data_parsed = json.loads(dryers_data)
         final_str = '`Floor|  Item   | Time Left\n'
-        for washer in washers_data_parsed:
-            minutes_left = returnMinutesLeft(washer["updatedAt"],washer["timeLeftUserInput"])
-            final_str += f'  9  | {washer["name"]}|   {minutes_left}\n'
-        for dryer in dryers_data_parsed:
-            minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
-            final_str += f'  9  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
+        # for washer in washers_data_parsed:
+        #     minutes_left = returnMinutesLeft(washer["updatedAt"],washer["timeLeftUserInput"])
+        #     final_str += f'  9  | {washer["name"]}|   {minutes_left}\n'
+        # for dryer in dryers_data_parsed:
+        #     minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
+        #     final_str += f'  9  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
 
         washers_response_API = requests.get(f'{api_url}/seventeenWashers')
         washers_data = washers_response_API.text
         washers_data_parsed = json.loads(washers_data)
-        dryers_response_API = requests.get(f'{api_url}/seventeenDryers')
-        dryers_data = dryers_response_API.text
-        dryers_data_parsed = json.loads(dryers_data)
+        # dryers_response_API = requests.get(f'{api_url}/seventeenDryers')
+        # dryers_data = dryers_response_API.text
+        # dryers_data_parsed = json.loads(dryers_data)
         for washer in washers_data_parsed:
             minutes_left = returnMinutesLeft(washer["updatedAt"],washer["timeLeftUserInput"])
             final_str += f' 17  | {washer["name"]}|   {minutes_left}\n'
-        for dryer in dryers_data_parsed:
-            minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
-            final_str += f' 17  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
+        # for dryer in dryers_data_parsed:
+        #     minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
+        #     final_str += f' 17  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
         final_str += '`'
         await context.bot.send_message(chat_id=update.effective_chat.id, text=final_str, parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
     elif text == 'Main Menu':
@@ -119,42 +119,42 @@ async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Function to handle any unknown messages
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command. Please press /start to start again.")
 
-async def update_machine(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    reply_keyboard = [[KeyboardButton("Update Floor 9")],
-                [KeyboardButton("Update Floor 17")]]
-    text = 'Updating machines...... \nPlease select a floor.\n\nPress /cancel to return to Main Menu'
+# async def update_machine(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     reply_keyboard = [[KeyboardButton("Update Floor 9")],
+#                 [KeyboardButton("Update Floor 17")]]
+#     text = 'Updating machines...... \nPlease select a floor.\n\nPress /cancel to return to Main Menu'
 
-    await update.message.reply_text(text=text, reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-
-
-    return 1
-
-async def pick_machine(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text not in ["Update Floor 9", "Update Floor 17"]:
-        await update.message.reply_text(text="Sorry I am unable to process your response. Please click on /start to try again", reply_markup=ReplyKeyboardRemove())
-        return ConversationHandler.END
-    user_input = update.message.text[-2:]
-    context.user_data['floor'] = user_input
-    reply_keyboard = [[KeyboardButton("W1"),KeyboardButton("W2"),KeyboardButton("W3"),KeyboardButton("W4"),KeyboardButton("W5")],
-                      [KeyboardButton("D1"),KeyboardButton("D2"),KeyboardButton("D3"),KeyboardButton("D4"),KeyboardButton("D5")]]
-    text = f'You selected Floor {context.user_data["floor"]}...... \nPlease select a machine.\n\nPress /cancel to return to Main Menu'
-    await update.message.reply_text(text=text, reply_markup=ReplyKeyboardMarkup(reply_keyboard))
-
-    return 2
-
-async def send_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text not in ["W1","W2","W3","W4","W5","D1","D2","D3","D4","D5"]:
-        await update.message.reply_text(text="Sorry I am unable to process your response. Please click on /start to try again", reply_markup=ReplyKeyboardRemove())
-        return ConversationHandler.END
-    user_input = update.message.text
-    context.user_data['machine'] = user_input
-    reply_keyboard = [[KeyboardButton("15")], [KeyboardButton("30")]]
-    text = f'You selected Floor {context.user_data["floor"]} Machine {context.user_data["machine"]} \n*You can either reply to me with the specific number of minutes remaining for this machine \(E\.g\. 7, 15, 18\)*, or click the buttons below \n\n Press /cancel to return to Main Menu'
+#     await update.message.reply_text(text=text, reply_markup=ReplyKeyboardMarkup(reply_keyboard))
 
 
-    await update.message.reply_text(text=text, reply_markup=ReplyKeyboardMarkup(reply_keyboard), parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+#     return 1
 
-    return 3
+# async def pick_machine(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     if update.message.text not in ["Update Floor 9", "Update Floor 17"]:
+#         await update.message.reply_text(text="Sorry I am unable to process your response. Please click on /start to try again", reply_markup=ReplyKeyboardRemove())
+#         return ConversationHandler.END
+#     user_input = update.message.text[-2:]
+#     context.user_data['floor'] = user_input
+#     reply_keyboard = [[KeyboardButton("W1"),KeyboardButton("W2"),KeyboardButton("W3"),KeyboardButton("W4"),KeyboardButton("W5")],
+#                       [KeyboardButton("D1"),KeyboardButton("D2"),KeyboardButton("D3"),KeyboardButton("D4"),KeyboardButton("D5")]]
+#     text = f'You selected Floor {context.user_data["floor"]}...... \nPlease select a machine.\n\nPress /cancel to return to Main Menu'
+#     await update.message.reply_text(text=text, reply_markup=ReplyKeyboardMarkup(reply_keyboard))
+
+#     return 2
+
+# async def send_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     if update.message.text not in ["W1","W2","W3","W4","W5","D1","D2","D3","D4","D5"]:
+#         await update.message.reply_text(text="Sorry I am unable to process your response. Please click on /start to try again", reply_markup=ReplyKeyboardRemove())
+#         return ConversationHandler.END
+#     user_input = update.message.text
+#     context.user_data['machine'] = user_input
+#     reply_keyboard = [[KeyboardButton("15")], [KeyboardButton("30")]]
+#     text = f'You selected Floor {context.user_data["floor"]} Machine {context.user_data["machine"]} \n*You can either reply to me with the specific number of minutes remaining for this machine \(E\.g\. 7, 15, 18\)*, or click the buttons below \n\n Press /cancel to return to Main Menu'
+
+
+#     await update.message.reply_text(text=text, reply_markup=ReplyKeyboardMarkup(reply_keyboard), parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
+
+#     return 3
 
 async def final(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message.text.isnumeric():
@@ -241,36 +241,38 @@ async def secretchannelmessage(update: Update, context: ContextTypes.DEFAULT_TYP
 
 async def update_status_message(context: ContextTypes.DEFAULT_TYPE) -> None:
 
-    washers_response_API = requests.get(f'{api_url}/washers')
-    washers_data = washers_response_API.text
+    # Constructing Final String for Lvl 9 Washers and Dryers
+    # washers_response_API = requests.get(f'{api_url}/washers')
+    # washers_data = washers_response_API.text
 
-    washers_data_parsed = json.loads(washers_data)
-    dryers_response_API = requests.get(f'{api_url}/dryers')
-    dryers_data = dryers_response_API.text
-    dryers_data_parsed = json.loads(dryers_data)
-    updated_time = return_formatted_current_datetime()
-    final_str = 'This message will be automatically updated every 1 minute \n\n' \
-    f'Last updated at {updated_time} \n\n'
-    final_str += '`Floor|  Item   | Time Left\n'
-    for washer in washers_data_parsed:
-        minutes_left = returnMinutesLeft(washer["updatedAt"],washer["timeLeftUserInput"])
-        final_str += f'  9  | {washer["name"]}|   {minutes_left}\n'
-    for dryer in dryers_data_parsed:
-        minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
-        final_str += f'  9  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
+    # washers_data_parsed = json.loads(washers_data)
+    # dryers_response_API = requests.get(f'{api_url}/dryers')
+    # dryers_data = dryers_response_API.text
+    # dryers_data_parsed = json.loads(dryers_data)
+    # updated_time = return_formatted_current_datetime()
+    # final_str = 'This message will be automatically updated every 1 minute \n\n' \
+    # f'Last updated at {updated_time} \n\n'
+    final_str = '`Floor|  Item   | Time Left\n'
+    # for washer in washers_data_parsed:
+    #     minutes_left = returnMinutesLeft(washer["updatedAt"],washer["timeLeftUserInput"])
+    #     final_str += f'  9  | {washer["name"]}|   {minutes_left}\n'
+    # for dryer in dryers_data_parsed:
+    #     minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
+    #     final_str += f'  9  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
 
+    # Constructing Final String for Lvl 17 Washers and Dryers
     washers_response_API = requests.get(f'{api_url}/seventeenWashers')
     washers_data = washers_response_API.text
     washers_data_parsed = json.loads(washers_data)
-    dryers_response_API = requests.get(f'{api_url}/seventeenDryers')
-    dryers_data = dryers_response_API.text
-    dryers_data_parsed = json.loads(dryers_data)
+    # dryers_response_API = requests.get(f'{api_url}/seventeenDryers')
+    # dryers_data = dryers_response_API.text
+    # dryers_data_parsed = json.loads(dryers_data)
     for washer in washers_data_parsed:
         minutes_left = returnMinutesLeft(washer["updatedAt"],washer["timeLeftUserInput"])
         final_str += f' 17  | {washer["name"]}|   {minutes_left}\n'
-    for dryer in dryers_data_parsed:
-        minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
-        final_str += f' 17  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
+    # for dryer in dryers_data_parsed:
+    #     minutes_left = returnMinutesLeft(dryer["updatedAt"],dryer["timeLeftUserInput"])
+    #     final_str += f' 17  | {dryer["name"][:-1]} {dryer["name"][-1]}|   {minutes_left}\n'
     final_str = final_str[:-1]
     final_str += '`'
     await context.bot.edit_message_text( final_str, chat_id='-1001932990612', message_id='14', parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
@@ -284,21 +286,21 @@ if __name__ == '__main__':
     message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), message)
 
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
-    update_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters.Regex("Update a machine"), update_machine)],
-        states= {
-            #0: [MessageHandler(filters.TEXT & ~filters.COMMAND, pick_floor)],
-            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, pick_machine)],
-            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, send_time)],
-            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, final)],
-            4: [MessageHandler(filters.TEXT & ~filters.COMMAND, reminder)]
-        },
-        fallbacks=[CommandHandler("cancel", cancel)],
-    )
+    # update_handler = ConversationHandler(
+    #     entry_points=[MessageHandler(filters.Regex("Update a machine"), update_machine)],
+    #     states= {
+    #         #0: [MessageHandler(filters.TEXT & ~filters.COMMAND, pick_floor)],
+    #         1: [MessageHandler(filters.TEXT & ~filters.COMMAND, pick_machine)],
+    #         2: [MessageHandler(filters.TEXT & ~filters.COMMAND, send_time)],
+    #         3: [MessageHandler(filters.TEXT & ~filters.COMMAND, final)],
+    #         4: [MessageHandler(filters.TEXT & ~filters.COMMAND, reminder)]
+    #     },
+    #     fallbacks=[CommandHandler("cancel", cancel)],
+    # )
     application.add_handler(start_update_loop_handler)
     application.add_handler(secretchannelmessage_handler)
     application.add_handler(start_handler)
-    application.add_handler(update_handler)
+    # application.add_handler(update_handler)
     application.add_handler(message_handler)
     #need to start update loop whenever bot runs agian
     application.add_handler(unknown_handler)
