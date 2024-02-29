@@ -92,7 +92,7 @@ void loop() {
     sensorValue4 = analogRead(analogInPin4);
 
     int sensorValues[5] = {sensorValue0, sensorValue1, sensorValue2, sensorValue3, sensorValue4};
-    int sensorThresholds[5] = {3800, 3000, 3000, 3000, 3000};
+    int sensorThresholds[5] = {3800, 3650, 3650, 3650, 3650};
     // print the results to the Serial Monitor:
     
     bool inUse[] = {false, false, false, false, false};
@@ -133,20 +133,25 @@ void loop() {
     JsonObject washer4 = doc[3];
     JsonObject washer5 = doc[4];
 
-    if (washer1["timeLeftUserInput"].as<int>() == 0 && inUse[0]) {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(1) + "\", \"timeLeftUserInput\": 30}");
+    if (inUse[0]) { //washer1["timeLeftUserInput"].as<int>() == 0 && inUse[0]) {
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(1) + "\", \"timeLeftUserInput\": 25}");
+      Serial.print("sensor 1 sent");
     }
-    if (washer2["timeLeftUserInput"].as<int>() == 0 && inUse[1]) {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(2) + "\", \"timeLeftUserInput\": 30}");
+    if (inUse[1]) { //washer2["timeLeftUserInput"].as<int>() == 0 && inUse[1]) {
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(2) + "\", \"timeLeftUserInput\": 25}");
+      Serial.print("sensor 2 sent");
     }
-    if (washer3["timeLeftUserInput"].as<int>() == 0 && inUse[2]) {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(3) + "\", \"timeLeftUserInput\": 30}");
+    if (inUse[2]) { //washer3["timeLeftUserInput"].as<int>() == 0 && inUse[2]) {
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(3) + "\", \"timeLeftUserInput\": 25}");
+      Serial.print("sensor 3 sent");
     }
-    if (washer4["timeLeftUserInput"].as<int>()== 0 && inUse[3]) {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(4) + "\", \"timeLeftUserInput\": 30}");
+    if (inUse[3]) { //washer4["timeLeftUserInput"].as<int>()== 0 && inUse[3]) {
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(4) + "\", \"timeLeftUserInput\": 25}");
+      Serial.print("sensor 4 sent");
     }
-    if (washer5["timeLeftUserInput"].as<int>() == 0 && inUse[4]) {
-      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(5) + "\", \"timeLeftUserInput\": 30}");
+    if (inUse[4]) { //washer5["timeLeftUserInput"].as<int>() == 0 && inUse[4]) {
+      httpResponseCode = http.PUT("{\"api_key\":\"https://free-api-ryfe.onrender.com\", \"name\": \"Washer " + String(5) + "\", \"timeLeftUserInput\": 25}");
+      Serial.print("sensor 5 sent");
     }
     http.end();
     Serial.println();
