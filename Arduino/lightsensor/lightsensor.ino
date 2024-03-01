@@ -92,7 +92,7 @@ void loop() {
     sensorValue4 = analogRead(analogInPin4);
 
     int sensorValues[5] = {sensorValue0, sensorValue1, sensorValue2, sensorValue3, sensorValue4};
-    int sensorThresholds[5] = {3800, 3650, 3650, 3650, 3650};
+    int sensorThresholds[5] = {3800, 3650, 2800, 3650, 3650};
     // print the results to the Serial Monitor:
     
     bool inUse[] = {false, false, false, false, false};
