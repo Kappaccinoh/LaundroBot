@@ -12,7 +12,7 @@ import asyncio
 api_url = 'https://free-api-ryfe.onrender.com'
 #api_url = 'https://laundrobot-api.onrender.com/'
 #api_url = 'http://localhost:3002'
-online_token = '6251328058:AAGlKyxiO77DDQ93xvKh_11iWwF2pemsVnE'
+online_token = 'REDACTED'
 
 
 
