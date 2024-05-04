@@ -203,7 +203,7 @@ Backend Lead: Khoo Wui Hong
 
 AutoCAD Lead: Reuben Thomas
 
-Team Members: Ryan Warwick Han, Bertrand Wong, Ethan Loo
+Team Members: Ryan Warwick Han, Bertrand Wong, Ethan Lu
 
 #### Special Thanks
 AY23/24 HGS: Denice Yeo
