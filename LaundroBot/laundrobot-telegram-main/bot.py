@@ -14,8 +14,6 @@ api_url = 'https://free-api-ryfe.onrender.com'
 #api_url = 'http://localhost:3002'
 online_token = 'REDACTED'
 
-
-
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
